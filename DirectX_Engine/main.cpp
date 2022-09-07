@@ -54,6 +54,8 @@ using namespace Microsoft::WRL;
 #include "BoxCollider.h"
 #include "CollisionManager.h"
 
+#include "MiniGage.h"
+
 Model* modelPlane = nullptr;
 Model* modelBox = nullptr;
 Model* modelPyramid = nullptr;
@@ -141,6 +143,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
  
     camera = new DebugCamera(WinApp::window_width, WinApp::window_height, input);
 
+    MiniGage* gage = nullptr;
+    gage = new MiniGage(WinApp::window_width, WinApp::window_height, input);
+
     //3D初期化
    Object3d::StaticInitialize(dxCommon->GetDev(), WinApp::window_width, WinApp::window_height);
 
@@ -171,12 +176,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
    spriteCommon->SpriteCommonLoadTexture(100, L"Resources/Red.png");
 
     //スプライト
-   // Sprite* sprite = Sprite::Create(spriteCommon,0);
+    Sprite* sprite = Sprite::Create(spriteCommon,0);
 
-  // spriteCommon-> SpriteCommonLoadTexture(0, L"Resources/Aiming.png"); 
-  // sprite->SetPosition({ 640,362.5,0 });
-  // sprite->SetSize({ 127,141 });
-   //sprite->SettexSize({ 127,141 });
+   spriteCommon-> SpriteCommonLoadTexture(0, L"Resources/Red.png"); 
+   sprite->SetPosition({ 640,362.5,0 });
+   sprite->SetSize({ 20,20 });
+   sprite->SettexSize({ 70,70 });
 
  
 
@@ -228,12 +233,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
     char moji[64];
     char moji2[64];
 
-  // Model* model1 = nullptr;
- //  Fbx3d* fbx3d1 = nullptr;
+   Model* model1 = nullptr;
+   Fbx3d* fbx3d1 = nullptr;
 
  
 
-  // model1 = FbxLoader::GetInstance()->LoadModelFromFile("wall1");
+   model1 = FbxLoader::GetInstance()->LoadModelFromFile("zazen");
    
 
 
@@ -246,12 +251,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
  
   //3Dオブジェクト生成とモデルのセット
-  //fbx3d1= new Fbx3d(input);
- // fbx3d1->Initialize();
- // fbx3d1->SetModel(model1);
+  fbx3d1= new Fbx3d(input);
+  fbx3d1->Initialize();
+  fbx3d1->SetModel(model1);
   
 
-  
+  fbx3d1->SetPosition({ 0, -10, 0 });
+  fbx3d1->SetRotate({ 0,0,0 });
+  fbx3d1->SetScale({ 0.05,0.05,0.05 });
+
 
   //衝突マネージャー
   CollisionManager* collisionManager = nullptr;
@@ -259,14 +267,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
   float radius = 5.0f;
 
+
+  XMFLOAT2 GageOrigin = { 200,360 };
  
     while (true)  // ゲームループ
     {
      //3d更新   
      //スプライト
 
-    //sprintf_s(moji, "X=%f", camera->GetUpx());
-    //sprintf_s(moji2, "Y=%f", camera->GetUpy());
+    sprintf_s(moji, "X=%f", gage->GetredXdir());
+    sprintf_s(moji2, "Y=%f", gage->GetredYdir());
     //sprintf_s(moji2, "camera=%f", camera->GetPositionY());
     //sprintf_s(moji2,"%d",camera->GetAngleY());
      
@@ -282,10 +292,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
         //初期化処理
 
         //ゲーム内の動作  
-
+        gage->Update();
         //更新
         input->Update();
 
+        fbx3d1->Update();
         camera->Update();
       
         //レンダ―テクスチャの描画
@@ -294,7 +305,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
         spriteCommon->PreDraw();
        
         //FBX描画
-    
+      //  fbx3d1->();
+        fbx3d1->Draw2(dxCommon->GetCmdList());
         //ポストエフェクトここまで
         sprite100->PostDrawScene(dxCommon->GetCmdList());
 
@@ -317,12 +329,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
         ////スプライト共通コマンド
         spriteCommon->PreDraw();
-        //debugtext->Print(moji, 100, 100);
+        debugtext->Print(moji, 100, 100);
         debugtext->DrawAll();//的カウント
 
-        //debugtext2->Print(moji2, 100, 200);
+        debugtext2->Print(moji2, 100, 200);
         debugtext2->DrawAll();//的カウント
 
+        sprite->SetPosition({ GageOrigin.x+gage->GetredXdir(),GageOrigin.y+gage->GetredYdir(),0 });
+        sprite->SpriteTransVertexBuffer();
+        sprite->Update();
+        sprite->SpriteDraw();
         // ４．描画コマンドここまで
         collisionManager->CheckAllCollisions();
         // DirectX毎フレーム処理　ここまで
