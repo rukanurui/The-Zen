@@ -55,6 +55,7 @@ using namespace Microsoft::WRL;
 #include "CollisionManager.h"
 
 #include "MiniGage.h"
+#include "SceneAction.h"
 
 Model* modelPlane = nullptr;
 Model* modelBox = nullptr;
@@ -114,6 +115,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
     //ポインタ置き場
     Input* input = nullptr;
+    Collision* collision = nullptr;
     WinApp* winApp = nullptr;
     Audio* audio = nullptr;
     GamePad* gamepad = nullptr;
@@ -136,6 +138,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 
      input = new Input();
+     collision = new Collision();
     //入力の初期化
     input->Intialize(winApp);
 
@@ -144,7 +147,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
     camera = new DebugCamera(WinApp::window_width, WinApp::window_height, input);
 
     MiniGage* gage = nullptr;
-    gage = new MiniGage(WinApp::window_width, WinApp::window_height, input);
+    gage = new MiniGage(WinApp::window_width, WinApp::window_height, input,collision);
+
+    SceneAction* sceneaction = nullptr;
+    sceneaction = new SceneAction(WinApp::window_width, WinApp::window_height, input);
 
     //3D初期化
    Object3d::StaticInitialize(dxCommon->GetDev(), WinApp::window_width, WinApp::window_height);
@@ -183,7 +189,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
    sprite->SetSize({ 20,20 });
    sprite->SettexSize({ 70,70 });
 
- 
+   Sprite* sprite1 = Sprite::Create(spriteCommon, 1);
+
+   spriteCommon->SpriteCommonLoadTexture(1, L"Resources/Blue.png");
+   sprite1->SetPosition({ 640,362.5,0 });
+   sprite1->SetSize({ 30,30 });
+   sprite1->SettexSize({ 70,70 });
+
 
     //デバックテキスト
     DebugText* debugtext=nullptr;
@@ -256,9 +268,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
   fbx3d1->SetModel(model1);
   
 
-  fbx3d1->SetPosition({ 0, -10, 0 });
+  fbx3d1->SetPosition({ 0, -5, 0 });
   fbx3d1->SetRotate({ 0,0,0 });
-  fbx3d1->SetScale({ 0.05,0.05,0.05 });
+  fbx3d1->SetScale({ 0.01,0.01,0.01 });
 
 
   //衝突マネージャー
@@ -268,14 +280,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
   float radius = 5.0f;
 
 
-  XMFLOAT2 GageOrigin = { 200,360 };
- 
+ // XMFLOAT2 GageOrigin = { 200,360 };
+  gage->Initialize();
+
+  sceneaction->SetHwnd(winApp->GetHwnd());
+  
     while (true)  // ゲームループ
     {
      //3d更新   
      //スプライト
 
-    sprintf_s(moji, "X=%f", gage->GetredXdir());
+    sprintf_s(moji, "X=%f", camera->GetCameraY());
     sprintf_s(moji2, "Y=%f", gage->GetredYdir());
     //sprintf_s(moji2, "camera=%f", camera->GetPositionY());
     //sprintf_s(moji2,"%d",camera->GetAngleY());
@@ -288,10 +303,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
         // DirectX毎フレーム処理　ここから
       
+        //Set関連
+        gage->SetScene(sceneaction->GetScene());
+        camera->SetScene(sceneaction->GetScene());
+
     
         //初期化処理
 
         //ゲーム内の動作  
+        sceneaction->Update();
+
         gage->Update();
         //更新
         input->Update();
@@ -306,10 +327,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
        
         //FBX描画
       //  fbx3d1->();
-        fbx3d1->Draw2(dxCommon->GetCmdList());
+       
         //ポストエフェクトここまで
         sprite100->PostDrawScene(dxCommon->GetCmdList());
 
+        fbx3d1->Draw2(dxCommon->GetCmdList());
         //バックバッファの番号を取得（2つなので0番か1番）
         dxCommon->PreDraw();
 
@@ -335,10 +357,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
         debugtext2->Print(moji2, 100, 200);
         debugtext2->DrawAll();//的カウント
 
-        sprite->SetPosition({ GageOrigin.x+gage->GetredXdir(),GageOrigin.y+gage->GetredYdir(),0 });
+        sprite1->SetPosition({ gage->GetblueX(),gage->GetblueY(),0 });
+        sprite1->SpriteTransVertexBuffer();
+        sprite1->Update();
+        sprite1->SpriteDraw();
+
+
+        sprite->SetPosition({ gage->GetredXdir(),gage->GetredYdir(),0 });
         sprite->SpriteTransVertexBuffer();
         sprite->Update();
         sprite->SpriteDraw();
+
+
+
         // ４．描画コマンドここまで
         collisionManager->CheckAllCollisions();
         // DirectX毎フレーム処理　ここまで

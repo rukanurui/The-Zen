@@ -25,6 +25,11 @@ public:
 	void SetDistance(float distance) {
 		this->distance = distance; viewDirty = true;
 	}
+
+	void SetScene(int scene_) { scene = scene_; }
+
+	float GetCameraY() { return Allcamerax; }
+
 	/*
 	float GetAngleX();
 	float GetAngleY();
@@ -58,7 +63,7 @@ private:
 	//
 	
 	// カメラ注視点までの距離
-	float distance = 20;
+	float distance = 50;
 	// スケーリング
 	float scaleX = 1.0f;
 	float scaleY = 1.0f;
@@ -66,6 +71,10 @@ private:
 	XMMATRIX matRot = DirectX::XMMatrixIdentity();
 	float angleX = 0;//カメラの角度X
     float angleY = 0;//カメラの角度Y
+
+	int scene;
+	float Allcamerax;
+
 	//
 	/*
 	float camera_posX = 0;

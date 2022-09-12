@@ -2,8 +2,13 @@ cbuffer cbuff0 : register(b0)
 {
 	float4 color;
 	matrix mat;
-	float Time;
-	float Bar;
+	float a;
+	float x;
+	float y;
+	float span;
+	float frame;
+	float scale;
+	
 };
 
 struct VSOutput

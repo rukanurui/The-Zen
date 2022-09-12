@@ -1,4 +1,4 @@
-#include "Post.hlsli"
+#include "Sprite.hlsli"
 
 
 
@@ -25,7 +25,19 @@ float4 main(VSOutput input) : SV_TARGET
 	//float density = 200;
 	float2 samplePoint = input.uv;
 	float4 colortex0 = tex0.Sample(smp, input.uv);
+	
+	samplePoint.x -= x;
+	samplePoint.y -= y;
+	float dist = sqrt(samplePoint.x * samplePoint.x + samplePoint.y * samplePoint.y);
+	float ang = atan2(samplePoint.y, samplePoint.x);
+
+	samplePoint.x = x + cos(ang) * (dist * (1.0 + sin(dist * span + frame * 31.4) * scale));
+	samplePoint.y = y + sin(ang) * (dist * (1.0 + sin(dist * span + frame * 31.4) * scale));
+
 	float4 Tex1 = tex1.Sample(smp, input.uv);
+
+
+	Tex1.a = a;
 
 	//float4 color = Tex0;
 	//if (fmod(input.uv.y, 0.1f) < 0.05f)

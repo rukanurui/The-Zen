@@ -100,8 +100,13 @@ void Sprite::Initialize(SpriteCommon* spriteCommon, UINT texnumber,
     ConstBufferData8* constMap = nullptr;
     result = constBuff_->Map(0, nullptr, (void**)&constMap);
     constMap->color8 = XMFLOAT4(1, 1, 1, 1);//色指定(R G B A)
-    constMap->Time8 = 0.0f;
-    constMap->Bar8 = -10.0f;
+    constMap->a8 = 0.0f;
+    constMap->x8 = 0.0f;
+    constMap->y8 = 0.0f;
+    constMap->span8 = 0.0f;
+    constMap->frame8 = 0.0f;
+    constMap->scale8 = 0.0f;
+
 
     //平行投影法
     constMap->mat8 = spriteCommon_->GetMatProjection();
@@ -241,17 +246,7 @@ void Sprite::Update()
     }
     */
 
-    constMap->Time8 += 2.0f;
-
-
-    if (constMap->Bar8 < 20.0f)
-    {
-        constMap->Bar8 += 0.05f;
-    }
-    else
-    {
-        constMap->Bar8 = -30.0f;
-    }
+ 
     constBuff_->Unmap(0, nullptr);
 }
 
@@ -272,7 +267,7 @@ void Sprite::SpriteDivDraw(float& DIVnum, float Divsize, float& sizex, float siz
     }
 }
 
-const float Sprite::clearColor[4] = { 0.25f,0.5f,0.1f,0.0f };
+const float Sprite::clearColor[4] = { 1.0f,1.0f,1.01f,0.0f };
 
 Sprite* Sprite::PostCreate(SpriteCommon* spriteCommon, UINT texnumber, DirectX::XMFLOAT2 anchorpoint, bool isFlagX, bool isFlagY)
 {
@@ -367,8 +362,13 @@ void Sprite::PostInitialize(SpriteCommon* spriteCommon, UINT texnumber,
     ConstBufferData8* constMap = nullptr;
     result = constBuff_->Map(0, nullptr, (void**)&constMap);
     constMap->color8 = XMFLOAT4(1, 1, 1, 1);//色指定(R G B A)
-    constMap->Time8 = 0.0f;
-    constMap->Bar8 = -10.0f;
+    constMap->a8 = 0.0f;
+    constMap->x8 = 0.0f;
+    constMap->y8 = 0.0f;
+    constMap->span8 = 0.0f;
+    constMap->frame8 = 0.0f;
+    constMap->scale8 = 0.0f;
+
 
     //平行投影法
     constMap->mat8 = spriteCommon_->GetMatProjection();

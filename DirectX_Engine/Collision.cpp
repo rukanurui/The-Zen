@@ -240,6 +240,25 @@ bool Collision::CheckRay2Sphere(const Ray& ray, const Sphere& sphere, float* dis
 
 }
 
+bool Collision::Check2DCollisionSphere(float x, float y, float r, float x2, float y2, float r2)
+{
+	//“–‚½‚è”»’è
+	XMVECTOR position_sub2 = XMVectorSet(
+		x - x2,
+		y - y2,
+		0 - 0,
+		0
+	);
+
+	position_sub2 = XMVector3Length(position_sub2);
+	float distance2 = position_sub2.m128_f32[0];
+
+	if (distance2 <= r + r2)
+	{
+		return true;
+	}
+}
+
 
 bool Collision::CheckSphere2Sphere(const Sphere& sphereA, const Sphere& sphereB, DirectX::XMVECTOR* inter, DirectX::XMVECTOR* reject)
 {
